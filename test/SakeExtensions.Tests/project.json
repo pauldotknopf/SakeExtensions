@@ -1,0 +1,13 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "SakeExtensions.Tests Class Library",
+  "authors": [ "Paul" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "frameworks": {
+    "net451": { },
+    "dnx451": { }
+  }
+}
