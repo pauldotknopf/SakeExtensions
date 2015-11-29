@@ -1,0 +1,81 @@
+use assembly="System.IO.Compression.FileSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+use namespace="System"
+use namespace="System.IO"
+use namespace="System.IO.Compression"
+use namespace="System.Net"
+
+default binDir = '${Path.Combine(Directory.GetCurrentDirectory(), "bin")}'
+
+default nodeVer = '5.1.0'
+default npmVer = '3.5.0'
+default nodeDir = '${Path.Combine(binDir, "nodejs")}'
+
+var nodeExe = 'node.exe'
+var npmZip = 'npm-${npmVer}.zip'
+var nodeDist = 'http://nodejs.org/dist/'
+var nodeUrl = '${nodeDist}v${nodeVer}/win-x86/${nodeExe}'
+var npmUrl = 'https://github.com/npm/npm/archive/v${npmVer}.zip'
+var nodeInstallExePath = '${Path.Combine(nodeDir, nodeExe)}'
+var npmInstallZipPath = '${Path.Combine(nodeDir, npmZip)}'
+var nodeInstalled = '${ File.Exists(nodeInstallExePath) }'
+
+default nodeGloballyInstalled = '${ !nodeInstalled && TestCommand("node", "--version") }'
+
+-// Command simply fails on Linux if nodejs is not available.
+var doInstall = '${ !IsLinux && !(nodeGloballyInstalled || nodeInstalled) }'
+
+@{
+    if (doInstall) {
+        Log.Info("Installing nodejs locally");
+
+        if (Directory.Exists(nodeDir))
+        {
+            Directory.Delete(nodeDir, recursive: true);
+        }
+        Directory.CreateDirectory(nodeDir);
+
+        // Download node
+        var wc = new WebClient();
+
+        Log.Info(string.Format("Downloading {0} to {1}", nodeUrl, nodeInstallExePath));
+        wc.DownloadFile(nodeUrl, nodeInstallExePath);
+
+        Log.Info(string.Format("Downloading {0} to {1}", npmUrl, npmInstallZipPath));
+        wc.DownloadFile(npmUrl, npmInstallZipPath);
+
+        // Unzip npm
+        Log.Info(string.Format("Unzipping npm to {0}", nodeDir));
+        ZipFile.ExtractToDirectory(npmInstallZipPath, Path.Combine(nodeDir, "node_modules"));
+
+        var npmFinalDirectory = Path.Combine(nodeDir, "node_modules", "npm");
+
+        if(!Directory.Exists(npmFinalDirectory))
+        {
+            foreach(var npmModule in Directory.GetDirectories(Path.Combine(nodeDir, "node_modules")))
+            {
+                if(new DirectoryInfo(npmModule).Name.StartsWith("npm-"))
+                {
+                    Directory.Move(npmModule, npmFinalDirectory);
+
+                    var binSourceDirectory = Path.Combine(npmFinalDirectory, "bin");
+                    var binDestinationDirectory = nodeDir;
+
+                    // copy the bin folder of the npm module to where node.exe is
+                    foreach (string dirPath in Directory.GetDirectories(binSourceDirectory, "*", 
+                        SearchOption.AllDirectories))
+                        Directory.CreateDirectory(dirPath.Replace(binSourceDirectory, binDestinationDirectory));
+
+                    foreach (string newPath in Directory.GetFiles(binSourceDirectory, "*.*", 
+                        SearchOption.AllDirectories))
+                        File.Copy(newPath, newPath.Replace(binSourceDirectory, binDestinationDirectory), true);
+                }
+            }
+        }
+    }
+
+    if(nodeInstalled)
+    {
+        // node is installed locally, add it to the path
+        System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + nodeDir, EnvironmentVariableTarget.Process);
+    }
+}
