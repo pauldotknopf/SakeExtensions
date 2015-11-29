@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>SakeExtensions</id>
+    <title>Sake Extensions</title>
+    <version>0.0</version>
+    <authors>Paul Knopf</authors>
+    <owners>Paul Knopf</owners>
+    <description>A generic set of useful commands (MSBuild/DNX/etc) for the Sake build system.</description>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="build\*.*" target="build" /> 
+  </files> 
+</package>

@@ -1,0 +1,21 @@
+var VERSION = '0.0.1'
+
+use namespace='System'
+use namespace='System.IO'
+use import='Environment'
+
+default BASE_DIR='${Directory.GetCurrentDirectory()}'
+default TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
+
+functions
+    @{
+        bool __WriteExecOutputToLogger = true;
+    }
+
+#default .pack
+
+#pack
+    directory create='${TARGET_DIR}'
+    nuget-pack nuspecFile='${Path.Combine(BASE_DIR, "SakeExtensions.nuspec")}' packageVersion='${VERSION}' outputDir='${TARGET_DIR}'
+
+
