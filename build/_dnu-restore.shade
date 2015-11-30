@@ -1,0 +1,6 @@
+default currentDir = '${ Directory.GetCurrentDirectory() }'
+default restoreDir = '${ currentDir }'
+
+default restore_options=''
+
+dnu dnuCommand='restore${ restore_options }' workingdir='${ restoreDir }'

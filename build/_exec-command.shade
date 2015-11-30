@@ -71,13 +71,6 @@ functions
         {
             throw new Exception(string.Format("Exit code {0} from {1}", process.ExitCode, commandline));
         }
-
-        ICollection envVarsSpawnedProcess = process.StartInfo.EnvironmentVariables.Keys;
-
-        foreach(var envv in envVarsSpawnedProcess)
-        {
-            Log.Error("Found::::" + envv);
-        }
     }
 }
 
