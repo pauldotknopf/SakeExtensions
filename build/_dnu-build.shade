@@ -1,0 +1,30 @@
+default configuration = 'Debug'
+default build_options= ''
+
+var args = ''
+
+@{
+    var projectsToPack = new List<string>();
+    foreach(var arg in projectFile.Split((char)';'))
+    {
+        if (!arg.Contains("*"))
+        {
+            projectsToPack.Add(Path.GetDirectoryName(arg));
+        }
+        else
+        {
+            var projectFolders = Files.Include(arg + "/project.json").Select(proj => Path.GetDirectoryName(proj));
+            projectsToPack.AddRange(projectFolders);
+        }
+    }
+
+    foreach(var projFolder in projectsToPack)
+    {
+        DeleteFolder(Path.Combine(projFolder, "bin", configuration));
+    }
+
+    var projectsArg=projectFile.Replace(";", " ");
+    args =string.Format("build{0} {1} --configuration {2}", build_options, projectsArg, configuration);
+}
+
+dnu dnuCommand='${args}'
