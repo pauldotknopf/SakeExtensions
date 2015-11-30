@@ -73,7 +73,7 @@ var doInstall = '${ !IsLinux && !(nodeGloballyInstalled || nodeInstalled) }'
         }
     }
 
-    if(nodeInstalled)
+    if(!nodeGloballyInstalled)
     {
         // node is installed locally, add it to the path
         System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + nodeDir, EnvironmentVariableTarget.Process);

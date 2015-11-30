@@ -21,7 +21,7 @@ namespace SakeExtensions.Tests
         {
             var appEnv = CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment)) as IApplicationEnvironment;
 
-            _sandBoxDirectory = Path.GetFullPath(Path.Combine(Path.Combine(appEnv.ApplicationBasePath, ".."), "sandbox-" + Guid.NewGuid().ToString().Replace("-", "")));
+            _sandBoxDirectory = Path.GetFullPath(Path.Combine(Path.Combine(appEnv.ApplicationBasePath, ".."), "sb-" + Guid.NewGuid().ToString().Substring(0,2).Replace("-", "")));
             Directory.CreateDirectory(_sandBoxDirectory);
 
             _shadesDirectory = Path.Combine(appEnv.ApplicationBasePath, "Shades");
