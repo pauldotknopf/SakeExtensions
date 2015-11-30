@@ -9,23 +9,22 @@ using System.Threading.Tasks;
 
 namespace SakeExtensions.Tests
 {
-    public class SandboxBase
+    public class SandboxBase : IDisposable
     {
         string _sandBoxDirectory;
         string _sakeExePath;
         string _sakeDirectory;
         string _buildScriptsDirectory;
+        string _shadesDirectory;
 
         public SandboxBase()
         {
             var appEnv = CallContextServiceLocator.Locator.ServiceProvider.GetService(typeof(IApplicationEnvironment)) as IApplicationEnvironment;
 
-            _sandBoxDirectory = Path.GetFullPath(Path.Combine(Path.Combine(appEnv.ApplicationBasePath, ".."), "sandbox"));
-
-            if (Directory.Exists(_sandBoxDirectory))
-                Directory.Delete(_sandBoxDirectory, true);
-
+            _sandBoxDirectory = Path.GetFullPath(Path.Combine(Path.Combine(appEnv.ApplicationBasePath, ".."), "sandbox-" + Guid.NewGuid().ToString().Replace("-", "")));
             Directory.CreateDirectory(_sandBoxDirectory);
+
+            _shadesDirectory = Path.Combine(appEnv.ApplicationBasePath, "Shades");
 
             _sakeDirectory = Path.GetFullPath(Path.Combine(Path.Combine(Path.Combine(appEnv.ApplicationBasePath, ".."), ".."), "tools", "sake"));
             _sakeExePath = Path.Combine(_sakeDirectory, "sake.exe");
@@ -40,7 +39,7 @@ namespace SakeExtensions.Tests
             var temp = Guid.NewGuid().ToString().Replace("-", "") + ".shade";
 
             File.WriteAllText(Path.Combine(_sandBoxDirectory, temp), shade);
-
+            
             var processStartInfo = new ProcessStartInfo
             {
                 UseShellExecute = false,
@@ -85,16 +84,19 @@ namespace SakeExtensions.Tests
             return result.ToString();
         }
 
-        protected bool SandboxFileExists(params string[] parts)
+        protected string RunShadeFile(string file)
         {
-            var path = _sandBoxDirectory;
+            if (!file.EndsWith(".shade"))
+                file += ".shade";
 
-            foreach(var part in parts)
-                path = Path.Combine(path, part);
-
-            return File.Exists(path);
+            return RunShade(File.ReadAllText(Path.Combine(_shadesDirectory, file)));
         }
 
+        protected bool SandboxFileExists(params string[] parts)
+        {
+            return File.Exists(SandboxPath(parts));
+        }
+        
         protected bool SandboxDirectoryExists(params string[] parts)
         {
             var path = _sandBoxDirectory;
@@ -103,6 +105,21 @@ namespace SakeExtensions.Tests
                 path = Path.Combine(path, part);
 
             return Directory.Exists(path);
+        }
+
+        protected string SandboxPath(params string[] parts)
+        {
+            var path = _sandBoxDirectory;
+
+            foreach (var part in parts)
+                path = Path.Combine(path, part);
+
+            return path;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }
