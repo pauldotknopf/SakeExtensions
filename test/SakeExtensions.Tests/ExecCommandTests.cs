@@ -12,7 +12,16 @@ namespace SakeExtensions.Tests
         [Fact]
         public void Can_execute_command()
         {
-            RunShadeFile("Can_execute_command");
+            RunShade(@"
+var VERSION='0.1'
+var FULL_VERSION='0.1'
+var AUTHORS='Paul Knopf'
+
+use import='Common'
+
+#default
+    exec-command commandline=""echo TEST > test.txt""
+");
             Assert.True(SandboxFileExists("test.txt"));
         }
     }

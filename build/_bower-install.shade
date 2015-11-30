@@ -1,0 +1,17 @@
+use assembly="System.IO.Compression.FileSystem, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+use namespace="System"
+use namespace="System.IO"
+use namespace="System.IO.Compression"
+use namespace="System.Net"
+
+default bowerVer = '1.6.8'
+default nodeDir = '${Path.Combine(Directory.GetCurrentDirectory(), "bin", "nodejs")}'
+
+node-install once='installNode'
+
+default bowerGloballyInstalled = '${ TestCommand("bower", "--version") }'
+
+-// Command simply fails on Linux if nodejs is not available.
+var doInstallBower = '${ !IsLinux && !bowerGloballyInstalled }'
+
+exec-command commandline='npm install bower' workingdir='${nodeDir}' if='doInstallBower'
