@@ -8,26 +8,32 @@ default binDir = '${Path.Combine(Directory.GetCurrentDirectory(), "bin")}'
 
 default dnvmVer = '1.0.0-rc1'
 default dnvmDir = '${Path.Combine(binDir, "dnvm")}'
+default forceInstall = 'false'
 
 var dnvmUrl = 'https://raw.githubusercontent.com/aspnet/dnvm/${dnvmVer}/src/'
-
-default dnvmInstalled = '${ Directory.Exists(dnvmDir) }'
-default dnvmGloballyInstalled = '${ !dnvmInstalled && TestCommand("dnvm", "version") }'
-
--// Command simply fails on Linux if nodejs is not available.
-var doInstall = '${ !(dnvmGloballyInstalled || dnvmInstalled) }'
+var dnvmInstalled = '${ Directory.Exists(dnvmDir) }'
+var doInstall = '${ bool.Parse(forceInstall) || !dnvmInstalled  }'
 
 @{
     if (doInstall) 
     {
         Log.Info("Installing dnvm locally");
 
-        throw new Exception("TODO");
-    }
+        if(Directory.Exists(dnvmDir))
+            Directory.Delete(dnvmDir, true);
 
-    if(!dnvmGloballyInstalled)
-    {
-        // node is installed locally, add it to the path
-        System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + dnvmDir, EnvironmentVariableTarget.Process);
+        Directory.CreateDirectory(dnvmDir);
+
+         // Download node
+        var wc = new WebClient();
+
+        Log.Info(string.Format("Downloading {0} to {1}", dnvmUrl + "dnvm.cmd", Path.Combine(dnvmDir, "dnvm.cmd")));
+        wc.DownloadFile(dnvmUrl + "dnvm.cmd", Path.Combine(dnvmDir, "dnvm.cmd"));
+
+        Log.Info(string.Format("Downloading {0} to {1}", dnvmUrl + "dnvm.ps1", Path.Combine(dnvmDir, "dnvm.cmd")));
+        wc.DownloadFile(dnvmUrl + "dnvm.ps1", Path.Combine(dnvmDir, "dnvm.ps1"));
+
+        Log.Info(string.Format("Downloading {0} to {1}", dnvmUrl + "dnvm.sh", Path.Combine(dnvmDir, "dnvm.cmd")));
+        wc.DownloadFile(dnvmUrl + "dnvm.sh", Path.Combine(dnvmDir, "dnvm.sh"));
     }
 }
