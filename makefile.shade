@@ -1,11 +1,10 @@
 var VERSION = '0.0.2'
 
-use namespace='System'
-use namespace='System.IO'
-use import='Environment'
+use import="Common"
 
 default BASE_DIR='${Directory.GetCurrentDirectory()}'
 default TARGET_DIR='${Path.Combine(BASE_DIR, "artifacts")}'
+default TEST_DIR='${Path.Combine(BASE_DIR, "test")}'
 
 functions
     @{
@@ -17,5 +16,11 @@ functions
 #pack
     directory create='${TARGET_DIR}'
     nuget-pack nuspecFile='${Path.Combine(BASE_DIR, "SakeExtensions.nuspec")}' packageVersion='${VERSION}' outputDir='${TARGET_DIR}'
+
+#test
+	dnvm-install
+	dnvm-use version='1.0.0-rc1-final'
+	dnu-restore restoreDir='${Path.Combine(Directory.GetCurrentDirectory(), "test")}'
+	dnx-test projectFile='${Path.Combine(TEST_DIR, "SakeExtensions.Tests", "project.json")}'
 
 
