@@ -1,1 +1,5 @@
-exec-command commandline='dnvm ${dnvmCommand}'
+default dnxDir = '${Directory.GetCurrentDirectory()}'
+default dnvmUse=''
+
+exec-command commandline='dnvm use ${dnvmUse} && dnx ${dnxCommand}' workingdir='${dnxDir}' if='!string.IsNullOrEmpty(dnvmUse)'
+exec-command commandline='dnx ${dnxCommand}' workingdir='${dnxDir}' if='string.IsNullOrEmpty(dnvmUse)'
