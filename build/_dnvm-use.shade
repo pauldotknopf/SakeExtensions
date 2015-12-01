@@ -1,0 +1,36 @@
+use namespace="System"
+use namespace="System.Text"
+
+default version='default'
+default architecture=''
+default runtime=''
+
+@{
+    var pathPattern = new Regex(@"Adding ((.)*) to process PATH", RegexOptions.IgnoreCase);
+    var dnvmCommand = "dnvm use";
+
+    if(string.IsNullOrEmpty(version))
+        throw new Exception("The 'version' parameter is required.");
+
+    dnvmCommand += " " + version;
+
+    if(!string.IsNullOrEmpty(architecture))
+        dnvmCommand += " -arch " + architecture;
+
+    if(!string.IsNullOrEmpty(runtime))
+        dnvmCommand += " -r " + runtime;
+
+    var output = ExecuteCommandOutput(dnvmCommand);
+
+    var match = pathPattern.Match(output);
+
+    if(!match.Success)
+        throw new Exception(string.Format("Un expected output from dnvm command '{0}'. {1}", dnvmCommand, output));
+
+    var runtimePath = match.Groups[1].Value;
+    Log.Info(string.Format("Adding runtime {0} to PATH", runtimePath));
+
+    System.Environment.SetEnvironmentVariable("PATH", runtimePath + ";" + System.Environment.GetEnvironmentVariable("PATH"), EnvironmentVariableTarget.Process);
+
+    // TODO:we may want to remove existing runtimes from the path.
+}
