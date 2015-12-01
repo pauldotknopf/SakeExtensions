@@ -47,7 +47,7 @@ public class Test
 }
 ");
 
-            var result = RunShadeDnx(@"
+            var result = RunShade(@"
 var VERSION='0.1'
 var FULL_VERSION='0.1'
 var AUTHORS='Paul Knopf'
@@ -55,6 +55,8 @@ var AUTHORS='Paul Knopf'
 use import=""Common""
 
 #default
+    dnvm-install
+    dnvm-use
     dnu-restore restoreDir='${Path.Combine(Directory.GetCurrentDirectory(), ""test"")}'
     dnx-test dnxDir='test' projectFile='${Path.Combine(Directory.GetCurrentDirectory(), ""test"", ""project.json"")}'
 ");

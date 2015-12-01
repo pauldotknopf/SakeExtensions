@@ -23,7 +23,7 @@ namespace SakeExtensions.Tests
 }
 ");
 
-            var result = RunShadeDnx(@"
+            var result = RunShade(@"
 var VERSION='0.1'
 var FULL_VERSION='0.1'
 var AUTHORS='Paul Knopf'
@@ -31,6 +31,8 @@ var AUTHORS='Paul Knopf'
 use import=""Common""
 
 #default
+    dnvm-install
+    dnvm-use
     dnu-restore restoreDir='testdirectory'
     dnu-build projectFile='testdirectory'
 ");
@@ -38,7 +40,7 @@ use import=""Common""
             Assert.True(result.Contains("Build succeeded."));
         }
 
-        //[Fact]
+        [Fact]
         public void Can_restore()
         {
             Directory.CreateDirectory(SandboxPath("testdirectory"));
@@ -53,7 +55,7 @@ use import=""Common""
 }
 ");
 
-            RunShadeDnx(@"
+            RunShade(@"
 var VERSION='0.1'
 var FULL_VERSION='0.1'
 var AUTHORS='Paul Knopf'
@@ -61,6 +63,8 @@ var AUTHORS='Paul Knopf'
 use import=""Common""
 
 #default
+    dnvm-install
+    dnvm-use
     dnu-restore restoreDir='testdirectory'");
 
             Assert.True(File.Exists(SandboxPath("testdirectory", "project.lock.json")));

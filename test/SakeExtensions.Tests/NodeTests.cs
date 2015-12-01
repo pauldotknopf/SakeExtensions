@@ -47,7 +47,7 @@ use import='Common'
             Assert.True(result.Contains("test output from script file"));
         }
 
-        //[Fact]
+        [Fact]
         public void Can_working_directory_in_node()
         {
             var testScript = SandboxPath("nested", "test.js");
@@ -64,7 +64,7 @@ use import='Common'
 
 #default
     node-install
-    node nodeCommand='test.js' workingdir='${Path.Combine(Directory.GetCurrentDirectory(), ""nested"")}'
+    node nodeCommand='test.js' workingDir='${Path.Combine(Directory.GetCurrentDirectory(), ""nested"")}'
 ");
 
             Assert.True(result.Contains("test output from script file"));
