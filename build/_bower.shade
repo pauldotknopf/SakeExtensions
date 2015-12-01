@@ -1,1 +1,1 @@
-exec-command commandline='bower ${bowerCommand}'
+exec-command commandLine='bower ${bowerCommand}'

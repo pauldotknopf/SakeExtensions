@@ -1,1 +1,1 @@
-exec-command commandline='npm ${npmCommand}'
+exec-command commandLine='npm ${npmCommand}'

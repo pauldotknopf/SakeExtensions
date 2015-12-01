@@ -55,6 +55,116 @@ functions @{
 
   string E(string key) { return Environment.GetEnvironmentVariable(key); }
   void E(string key, string value) { Environment.SetEnvironmentVariable(key, value); }
+
+  void ExecuteCommand(string command, string workingDir = null)
+  {
+    if(string.IsNullOrEmpty(workingDir))
+      workingDir = Directory.GetCurrentDirectory();
+
+    ProcessStartInfo processStartInfo;
+
+    if(!IsLinux)
+    {
+      processStartInfo = new ProcessStartInfo {
+          UseShellExecute = false,
+          WorkingDirectory = workingDir,
+          FileName = "cmd",
+          Arguments = "/C " + command,
+      };
+    } else
+    {
+      processStartInfo = new ProcessStartInfo {
+          UseShellExecute = false,
+          WorkingDirectory = workingDir,
+          Arguments = command,
+      };
+    }
+
+    processStartInfo.RedirectStandardError = true;
+    processStartInfo.RedirectStandardOutput = true;
+
+    using (var process = Process.Start(processStartInfo))
+    {
+      process.EnableRaisingEvents = true;
+      process.BeginOutputReadLine();
+      process.BeginErrorReadLine();
+
+      process.ErrorDataReceived += (sender, eventArgs) =>
+      {
+        if (!string.IsNullOrWhiteSpace(eventArgs.Data))
+        {
+          Log.Error(eventArgs.Data);
+        }
+      };
+
+      process.OutputDataReceived += (sender, eventArgs) =>
+      {
+        Log.Info(eventArgs.Data);
+      };
+
+      process.WaitForExit();
+
+      if (process.ExitCode != 0)
+        throw new Exception(string.Format("Exit code {0} from {1}", process.ExitCode, command));
+    }
+  }
+
+  string ExecuteCommandOutput(string command, string workingDir = null)
+  {
+    if(string.IsNullOrEmpty(workingDir))
+      workingDir = Directory.GetCurrentDirectory();
+
+    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+    ProcessStartInfo processStartInfo;
+
+    if(!IsLinux)
+    {
+      processStartInfo = new ProcessStartInfo {
+          UseShellExecute = false,
+          WorkingDirectory = workingDir,
+          FileName = "cmd",
+          Arguments = "/C " + command,
+      };
+    } else
+    {
+      processStartInfo = new ProcessStartInfo {
+          UseShellExecute = false,
+          WorkingDirectory = workingDir,
+          Arguments = command,
+      };
+    }
+
+    processStartInfo.RedirectStandardError = true;
+    processStartInfo.RedirectStandardOutput = true;
+
+    using (var process = Process.Start(processStartInfo))
+    {
+      process.EnableRaisingEvents = true;
+      process.BeginOutputReadLine();
+      process.BeginErrorReadLine();
+
+      process.ErrorDataReceived += (sender, eventArgs) =>
+      {
+        if (!string.IsNullOrWhiteSpace(eventArgs.Data))
+        {
+          sb.AppendLine(eventArgs.Data);
+        }
+      };
+
+      process.OutputDataReceived += (sender, eventArgs) =>
+      {
+        sb.AppendLine(eventArgs.Data);
+      };
+
+      process.WaitForExit();
+
+      if (process.ExitCode != 0)
+        throw new Exception(string.Format("Exit code {0} from {1}", process.ExitCode, command));
+    }
+
+    return sb.ToString();
+  }
 }
 
 macro name="DeleteFolder" delete='string'

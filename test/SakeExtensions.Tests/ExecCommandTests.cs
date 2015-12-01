@@ -20,7 +20,7 @@ var AUTHORS='Paul Knopf'
 use import='Common'
 
 #default
-    exec-command commandline=""echo TEST > test.txt""
+    exec-command commandLine=""echo TEST > test.txt""
 ");
             Assert.True(SandboxFileExists("test.txt"));
         }

@@ -1,1 +1,1 @@
-exec-command commandline='node ${nodeCommand}'
+exec-command commandLine='node ${nodeCommand}'

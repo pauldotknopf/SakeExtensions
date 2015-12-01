@@ -14,4 +14,4 @@ default bowerGloballyInstalled = '${ TestCommand("bower", "--version") }'
 -// Command simply fails on Linux if nodejs is not available.
 var doInstallBower = '${ !IsLinux && !bowerGloballyInstalled }'
 
-exec-command commandline='npm install bower' workingdir='${nodeDir}' if='doInstallBower'
+exec-command commandLine='npm install bower' workingDir='${nodeDir}' if='doInstallBower'
