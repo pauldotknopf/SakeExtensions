@@ -44,7 +44,7 @@ var doInstall = '${ !IsLinux && !(nodeGloballyInstalled || nodeInstalled) }'
         wc.DownloadFile(npmUrl, npmInstallZipPath);
 
         // Unzip npm
-        Log.Info(string.Format("Unzipping npm to {0}", nodeDir));
+        Log.Info(string.Format("Unzipping npm to {0}", Path.Combine(nodeDir, "node_modules")));
         ZipFile.ExtractToDirectory(npmInstallZipPath, Path.Combine(nodeDir, "node_modules"));
 
         var npmFinalDirectory = Path.Combine(nodeDir, "node_modules", "npm");
@@ -55,10 +55,14 @@ var doInstall = '${ !IsLinux && !(nodeGloballyInstalled || nodeInstalled) }'
             {
                 if(new DirectoryInfo(npmModule).Name.StartsWith("npm-"))
                 {
+                    Log.Info(string.Format("Moving {0} to {1}", npmModule, npmFinalDirectory));
+
                     Directory.Move(npmModule, npmFinalDirectory);
 
                     var binSourceDirectory = Path.Combine(npmFinalDirectory, "bin");
                     var binDestinationDirectory = nodeDir;
+
+                    Log.Info(string.Format("Moving npm bin contents from {0} to {1}", binSourceDirectory, binDestinationDirectory));
 
                     // copy the bin folder of the npm module to where node.exe is
                     foreach (string dirPath in Directory.GetDirectories(binSourceDirectory, "*", 
