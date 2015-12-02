@@ -37,7 +37,7 @@ use import='Common'
 
 #default
     bower-install
-    bower bowerCommand='install jquery' workingDir='${Path.Combine(Directory.GetCurrentDirectory(), ""nested"")}
+    bower bowerCommand='install jquery' workingDir='${Path.Combine(Directory.GetCurrentDirectory(), ""nested"")}'
 ");
 
             Assert.True(SandboxFileExists("nested", "bower_components", "jquery", "dist", "jquery.js"));
