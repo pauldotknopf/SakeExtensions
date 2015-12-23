@@ -3,4 +3,6 @@ var VERSION='0.1'
 var FULL_VERSION='0.1'
 var AUTHORS='Paul Knopf'
 
+use import="Common"
+
 use-standard-lifecycle
